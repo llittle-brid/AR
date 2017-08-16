@@ -14,10 +14,11 @@ public class SendMes{
 		  PrintWriter printWriter=null;
 		  OutputStream outputStream=null;
 		 try {
-			outputStream = socket.getOutputStream();// 获取一个输出流，向服务端发送信息
-			  printWriter =new PrintWriter(outputStream);//将输出流包装成打印流
-			  printWriter.print(message);
-			  printWriter.flush();
+			  outputStream = socket.getOutputStream();// 获取一个输出流，向服务端发送信息
+			  outputStream.write(message.getBytes());
+//			  printWriter =new PrintWriter(outputStream);//将输出流包装成打印流
+//			  printWriter.print(message);
+//			  printWriter.flush();
 			  socket.shutdownOutput();//关闭输出流
 			  //关闭相对应的资源
 		} 

@@ -22,18 +22,21 @@ public class Service {
 	public void getMethod(Socket socket) {
 		String message = "";
 		InputStream inputStream = null;
-		InputStreamReader inputStreamReader = null;
-		BufferedReader bufferedReader = null;
+		BufferedInputStream bufferedInputStream = null;
+//		InputStreamReader inputStreamReader = null;
+//		BufferedReader bufferedReader = null;
 		try {
 			inputStream = socket.getInputStream();
-			inputStreamReader = new InputStreamReader(inputStream);
-			bufferedReader = new BufferedReader(inputStreamReader);
-			String temp = null;
-			while ((temp = bufferedReader.readLine()) != null) {
-				message += temp;
-			}
+			bufferedInputStream = new BufferedInputStream(socket.getInputStream());
+			byte[] buf = new byte[1024];
+//			inputStreamReader = new InputStreamReader(inputStream);
+//			bufferedReader = new BufferedReader(inputStreamReader);
+//			String temp = null;
+//			while ((temp = bufferedReader.readLine()) != null) {
+//				message += temp;
+			bufferedInputStream.read(buf);
+			message=new String(buf,"utf-8").trim();
 			System.out.println(message);
-
 		} catch (Exception e) {
 		}
 		String[] temp = message.split(" ");
