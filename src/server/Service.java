@@ -8,6 +8,7 @@ import java.util.List;
 
 import dao.*;
 import daoImp.*;
+import entities.UserProgress;
 
 public class Service {
 	// 声明一个输出流
@@ -23,19 +24,19 @@ public class Service {
 		String message = "";
 		InputStream inputStream = null;
 		BufferedInputStream bufferedInputStream = null;
-//		InputStreamReader inputStreamReader = null;
-//		BufferedReader bufferedReader = null;
+		// InputStreamReader inputStreamReader = null;
+		// BufferedReader bufferedReader = null;
 		try {
 			inputStream = socket.getInputStream();
 			bufferedInputStream = new BufferedInputStream(socket.getInputStream());
 			byte[] buf = new byte[1024];
-//			inputStreamReader = new InputStreamReader(inputStream);
-//			bufferedReader = new BufferedReader(inputStreamReader);
-//			String temp = null;
-//			while ((temp = bufferedReader.readLine()) != null) {
-//				message += temp;
+			// inputStreamReader = new InputStreamReader(inputStream);
+			// bufferedReader = new BufferedReader(inputStreamReader);
+			// String temp = null;
+			// while ((temp = bufferedReader.readLine()) != null) {
+			// message += temp;
 			bufferedInputStream.read(buf);
-			message=new String(buf,"utf-8").trim();
+			message = new String(buf, "utf-8").trim();
 			System.out.println(message);
 		} catch (Exception e) {
 		}
@@ -47,6 +48,9 @@ public class Service {
 			break;
 		case "register":
 			register(message, socket);
+			break;
+		case "learned":
+			learned(message, socket);
 			break;
 		default:
 			error(socket);
@@ -60,17 +64,30 @@ public class Service {
 
 	public void login(String message, Socket socket) {
 		String[] temp = message.split(" ");
+		int user_id;
 		try {
 			String user_name = temp[1];
 			String password = temp[2];
-			if (userDao.login(user_name, password) == true)
-				message = "login success";
-			else
-				message = "login false";
+			if ((user_id = userDao.login(user_name, password)) != 0) {
+				message = "loginResult success userId{" + user_id + "}";
+				UserProgressDao userProgressDao = new UserProgressDaoImp();
+				List<UserProgress> userProgress = userProgressDao.getAll(user_id);
+				String temp_message = "pageId{";
+				if (userProgress != null) {
+					for (int i = 0; i < userProgress.size(); i++) {
+						temp_message += userProgress.get(i).getPage_id();
+						if (i != userProgress.size() - 1)
+							temp_message += ",";
+					}
+				}
+				temp_message += "}";
+				message+=" "+temp_message;
+			} else
+				message = "loginResult false";
 			sendMes.send(message, socket);
 		} catch (Exception e) {
 			e.printStackTrace();
-			message = "login false";
+			message = "loginResult false";
 			sendMes.send(message, socket);
 		}
 	}
@@ -80,19 +97,33 @@ public class Service {
 		try {
 			String user_name = temp[1];
 			String password = temp[2];
-			int gender = Integer.valueOf(temp[3]);
+			int gender = temp[3].equals("男") ? 1 : 0;
 			int age = Integer.valueOf(temp[4]);
 			String tel = temp[5];
 			String mail = temp[6];
 			userDao.register(user_name, password, gender, age, tel, mail);
-			message = "register success";
+			message = "registerResult success";
 			sendMes.send(message, socket);
 		} catch (Exception e) {
 			e.printStackTrace();
-			message = "register false";
+			message = "registerResult false";
 			sendMes.send(message, socket);
 		}
+	}
 
+	private void learned(String message, Socket socket) {
+		String[] temp = message.split(" ");
+		try {
+			int user_name = Integer.valueOf(temp[1]);
+			int pageId = Integer.valueOf(temp[2]);
+			userDao.learned(user_name, pageId);
+			message = "learnedResult success";
+			sendMes.send(message, socket);
+		} catch (Exception e) {
+			e.printStackTrace();
+			message = "learnedResult false";
+			sendMes.send(message, socket);
+		}
 	}
 
 }

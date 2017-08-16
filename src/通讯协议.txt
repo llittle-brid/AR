@@ -1,6 +1,6 @@
 1.登录
 发送消息： login username password;
-返回消息   成功：loginResult success page{pageId,pageId};
+返回消息   成功：loginResult success userId{userId} page{pageId,pageId};
                   失败： loginResult false
 
 2.注册
