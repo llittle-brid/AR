@@ -1,0 +1,12 @@
+1.登录
+发送消息： login username password;
+返回消息   成功：loginResult success page{pageId,pageId};
+                  失败： loginResult false
+
+2.注册
+发送消息：register username password gender age tel mail
+返回消息：registerResult success/false
+
+3.学习
+发送消息：learned username userId
+返回消息 learnedResult success/false
